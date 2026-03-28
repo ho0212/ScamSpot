@@ -1,0 +1,24 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Bold;\f1\froman\fcharset0 Times-Roman;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww16900\viewh12200\viewkind0
+\deftab720
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs24 \cf0 \expnd0\expndtw0\kerning0
+Week 5
+\f1\b0 \
+This week I built a quick baseline classification model for our scam detector. This way I could wire a working /predict function into FastAPI and let the frontend call something real for testing. Others focused on early UI and data collection. I felt productive, but uneasy about future breakage. Getting in early with something functional felt satisfying for momentum, but was also troubling because the model and API outputs weren\'92t formally agreed with the team. We never locked in a shared data structure (labels, confidence meaning, top-words) for the scam detector, so later model swaps were bound to cause issues and require debugging. Although these issues ended up being quite easy to resolve, in other projects I may have had to redo a lot of work and it may be worthwhile holding off until the plan is more defined. However, I felt like having something working provided structure for the rest of the team and gave the frontend developers an idea of what the end result would look like. In future I think it would be beneficial to define a schema first, wrap each model with a tiny adapter that emits that schema, and add a schema test that fails if fields/labels drift. This will ensure everyone is aware of what the backend/frontend expects. \
+
+\f0\b Week 6\
+
+\f1\b0 In this week I pushed our first Elastic Beanstalk deploy. We hit SSL/proxy/Procfile issues close to the deadline and this made me stressed, focusing on firefighting instead of polishing. Overall I was really happy with our build and glad we got something working but the timing was the worrying part. Our first deploy happened too late, so routine platform issues created stress for myself and the team. In future I think it\'92s important to always deploy a \'93Hello-World\'94 in week one, add smoke tests (/health + one sample prediction), and keep more detailed records of deployments (version labels + update-environment + log commands). I added /health and wrote a short rollback/runbook we used later when reverting.\
+
+\f0\b Week 7
+\f1\b0 \
+As a group, we agreed on the architecture for iteration 2: a lightweight router (SMS vs Email) feeding into two specialised models. Those discussions with Malone and Felix clarified flow and I felt confident about direction but slightly wary about interfaces. The design choice was strong but ambiguity around outputs remained concerning. As we had different people working on different models, different label sets (0/2 vs 0/1), confidence semantics, and top-word lengths were used. This worked great locally and individually but caused a lot of issues during integration. Similar to Week 5 I think the solve here is discussing and locking in these outputs early: labels must be "scam"/"legitimate", confidence is P(predicted_label) in [0,1], top_words is a short list of \{word, contribution\}, and context is "SMS"/"Email". If we had this locked in before starting work on iteration 2, it would have saved a lot of time as we had to go back and correct these discrepancies after and a lot of the code had referenced these specific structures. \
+
+\f0\b Week 8
+\f1\b0  \
+Integration exposed a few issues such as model paths, pickled TextPreprocessor imports, missing NLTK data on the server, and EB stalling when bundles had unnecessary files. I felt frustrated, then relieved when it finally stabilised. This was a troublesome week technically, but high learning value. Most issues were packaging/env mismatches rather than bad models: artifacts weren\'92t isolated, assumptions about local NLTK didn\'92t hold in production, and inconsistent label maps confused the API. I added a shim so TextPreprocessor could import cleanly, normalised class mapping to "scam"/"legitimate", computed confidence for the predicted class, introduced a lightweight cleaner when NLTK isn\'92t present, and moved artifacts into /app/saved_model with env-var overrides. We also added post-deploy smoke calls and used EB rollback to recover our working build. Going forward I plan to keep a packaging checklist and ship smaller, safer releases. By shipping smaller releases these mismatches could have been properly resolved in the training of the model. Instead shims and normalisation had to be created in the backend. I believe this isn\'92t the most clear way to resolve these issues and isn\'92t standard, typically these mismatches and issues should be fixed in the training of the model. This is why it is important to clarify these issues earlier and deploy/test more frequently to surface issues. }

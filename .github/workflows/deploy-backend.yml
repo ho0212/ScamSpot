@@ -1,0 +1,24 @@
+name: Deploy Backend
+on:
+  push:
+    branches: [main]
+    paths: ['backend/**']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install EB CLI
+        run: pip install awsebcli
+      - name: Deploy to Elastic Beanstalk
+        working-directory: ./backend
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          eb init --platform "Node.js 20 running on 64bit Amazon Linux 2023" --region ap-southeast-2 spot-scam-backend
+          eb deploy production
