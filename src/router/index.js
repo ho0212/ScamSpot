@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Password from '@/views/Password.vue'
 import HomeView from '../views/HomeView.vue'
 import LearningModuleLayout from '../views/LearningModule/LearningModuleLayout.vue'
 import ScamDetector from '@/views/scamDetector/ScamDetector.vue'
@@ -16,16 +15,16 @@ import NotFound from '@/views/NotFound.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+
     {
       path: '/',
-      name: 'password',
-      component: Password,
+      name: 'home',
+      component: HomeView
     },
     {
       path: '/home',
       name: 'home',
-      component: HomeView,
-      meta: { requiresAuth: true }
+      component: HomeView
     },
     {
       path: '/learning-module/:moduleName?',
@@ -98,15 +97,15 @@ const router = createRouter({
 })
 
 //Route guard to check authentication
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = sessionStorage.getItem('scamspot_auth') === 'true'
+// router.beforeEach((to, from, next) => {
+//   const isAuthenticated = sessionStorage.getItem('scamspot_auth') === 'true'
 
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    next(`/?redirect=${to.path}`);
-  } else {
-    next()
-  }
-})
+//   if (to.meta.requiresAuth && !isAuthenticated) {
+//     next(`/?redirect=${to.path}`);
+//   } else {
+//     next()
+//   }
+// })
 
 
 export default router
